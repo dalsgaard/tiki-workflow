@@ -1,0 +1,14 @@
+#!/bin/env ruby
+
+require_relative '../lib/workflow'
+
+# Plug-ins
+require_relative '../plugins/foo'
+require_relative '../plugins/baz'
+
+file = ARGV[0]
+if file
+  Workflow.workflow file: file
+else
+  puts 'workflow <filename>'
+end

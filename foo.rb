@@ -1,11 +1,7 @@
-class Foo
-  def foo
-    5
+workflow do
+  use :foo
+
+  map :foo, :bar do |i|
+    i * i
   end
 end
-
-bar = Foo.new
-res = bar.instance_eval do
-  foo
-end
-puts res + 3
