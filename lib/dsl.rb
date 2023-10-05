@@ -20,7 +20,7 @@ module Workflow
     end
 
     def let(name, value = nil, &block)
-      source_items << LetItem.new(name, value = nil, &block)
+      source_items << LetItem.new(name, value, &block)
     end
 
     def each(source, &block)

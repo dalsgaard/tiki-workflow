@@ -13,7 +13,7 @@ module Workflow
     def initialize(name, value = nil, id: nil, &block)
       super(id)
       @name = name
-      @block = block || -> { value }
+      @block = block || Proc.new { value }
     end
   end
 
