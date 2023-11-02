@@ -9,18 +9,18 @@ module Workflow
     end
 
     def apply_dsl_plugin(dsl, name)
-      unless dsl.plugin?(name)
-        plugin = @plugins[name]
-        plugin.uses.each do |dep|
-          apply_dsl_plugin(dsl, dep)
-        end
-        dsl.extend plugin.dsl if plugin.dsl?
-        dsl.add_pres plugin.pres
-        dsl.add_posts plugin.posts
-        dsl.add_plugin name
+      return if dsl.plugin?(name)
+
+      plugin = @plugins[name]
+      plugin.dependencies.each do |dep|
+        apply_dsl_plugin(dsl, dep)
       end
+      dsl.extend plugin.dsl if plugin.dsl?
+      dsl.add_pres plugin.pres
+      dsl.add_posts plugin.posts
+      dsl.add_plugin name
     end
-    
+
     def apply_runner_plugins(runner_class, *names)
       names.flatten.each do |name|
         plugin = @plugins[name]
@@ -29,11 +29,11 @@ module Workflow
     end
 
     class Plugin
-      attr_reader :pres, :posts, :uses
+      attr_reader :pres, :posts, :dependencies
 
       def initialize(name = nil)
         @name = name
-        @uses = []
+        @dependencies = []
         @pres = []
         @posts = []
       end
@@ -43,14 +43,14 @@ module Workflow
         @name
       end
 
-      def use(*plugins)
-        @uses += plugins
+      def depends(*plugins)
+        @dependencies += plugins
       end
 
       def dsl(&block)
         if block
           @dsl = Module.new
-          @dsl.module_eval &block
+          @dsl.module_eval(&block)
         end
         @dsl
       end
@@ -58,16 +58,16 @@ module Workflow
       def runner(&block)
         if block
           @runner = Module.new
-          @runner.module_eval &block
+          @runner.module_eval(&block)
         end
         @runner
       end
 
-      def dsl?()
+      def dsl?
         !!@dsl
       end
 
-      def runner?()
+      def runner?
         !!@runner
       end
 
@@ -83,7 +83,7 @@ module Workflow
 
   def self.plugin(name = nil, &block)
     plugin = Plugin::Plugin.new(name)
-    plugin.instance_eval &block
+    plugin.instance_eval(&block)
     Plugin.add plugin
   end
 end

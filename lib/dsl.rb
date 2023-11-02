@@ -3,19 +3,19 @@ require_relative 'plugin'
 
 module Workflow
   class Dsl
-    attr_reader :uses, :plugins
+    attr_reader :plugins
 
     def initialize(&block)
-      @uses = []
       @plugins = []
+      @all_plugins = []
       @items = []
       @pres = []
       @posts = []
       instance_eval(&block) if block
     end
 
-    def use(name)
-      @uses << name
+    def plugin(name)
+      @plugins << name
       Plugin.apply_dsl_plugin self, name
     end
 
@@ -37,47 +37,48 @@ module Workflow
 
     def pre(&block)
       @source_mode = :pre
-      instance_eval &block
+      instance_eval(&block)
       @source_mode = nil
     end
 
     def post(&block)
       @source_mode = :post
-      instance_eval &block
+      instance_eval(&block)
       @source_mode = nil
     end
 
-    def workflow(name = nil, &block)
-      instance_eval &block
+    def workflow(_name = nil, &block)
+      instance_eval(&block)
     end
 
-    def items()
+    def items
       @pres + @items + @posts
     end
 
     def add_pres(*blocks)
       blocks.flatten.each do |block|
-        pre &block
+        pre(&block)
       end
     end
 
     def add_posts(*blocks)
       blocks.flatten.each do |block|
-        post &block
+        post(&block)
       end
     end
 
     def add_plugin(name)
-      @plugins << name
+      puts name
+      @all_plugins << name
     end
 
     def plugin?(name)
-      @plugins.include? name
+      @all_plugins.include? name
     end
 
     private
 
-    def source_items()
+    def source_items
       case @source_mode
       when :pre then @pres
       when :post then @posts

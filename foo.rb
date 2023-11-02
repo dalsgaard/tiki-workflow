@@ -1,5 +1,5 @@
 workflow do
-  use :foo
+  plugin :foo
 
   let :baz, 5
 

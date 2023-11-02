@@ -1,8 +1,8 @@
 Workflow.plugin :foo do
-  use :baz
+  depends :baz
 
   dsl do
-    def foo()
+    def foo
       let :foo do
         [1, 3, 5, 7, 9]
       end
